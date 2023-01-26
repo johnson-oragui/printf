@@ -1,82 +1,72 @@
-#include <stdio.h>
-#include <stdarg.h>
-#include <strings.h>
-#include <limits.h>
 #include "main.h"
+
+void print_buffer(char buffer[], int *buff_ind);
+
 /**
- * _printf - prints formatted text
- * @format: series of arguments
- * Return: formatted text
+ * _printf - Printf function
+ * @format: format.
+ * Return: Printed chars.
  */
 int _printf(const char *format, ...)
 {
-	va_list args;
-	int count = 0;
-	int i;
-	unsigned int n;
-	int index;
+	int i, printed = 0, printed_chars = 0;
+	int flags, width, precision, size, buff_ind = 0;
+	va_list list;
+	char buffer[BUFF_SIZE];
 
-	va_start(args, format);
-	for (i = 0; format[i] != '0'; i++)
+	if (format == NULL)
+		return (-1);
+
+	va_start(list, format);
+
+	for (i = 0; format && format[i] != '\0'; i++)
 	{
-		if (format[i] == '%')
+		if (format[i] != '%')
 		{
-			i++;
-			switch (format[i])
-			{
-				case 'c':
-					_putchar(va_arg(args, int));
-					count++;
-					break;
-				case 's':
-					printf("%s", va_arg(args, char *));
-					count += strlen(var_arg(args, char));
-					break;
-				case 'd':
-				case 'i':
-					count += printf("%d", va_arg(args, int));
-					break;
-				case 'b':
-					n = va_arg(args, unsigned int);
-					char bin_str(sizeof(unsigned int) * 8 + 1);
-					index = sizeof(unsigned int) * 8;
-					bin_str[index] = '0';
-					while (n > 0)
-					{
-						bin_str[--index] = (n % 2) + '0';
-						n /= 2;
-					}
-					printf("%s", &bin_str[index]);
-					count += sizeof(unsigned int) * 8 - index;
-					break;
-				case 'u':
-					count += printf("%u", va_arg(args, unsigned int));
-					break;
-				case 'o':
-					count += printf("%o", va_arg(args, unsigned int));
-					break;
-				case 'x':
-					count += printf("%x", va_arg(args, unsigned int));
-					break;
-				case 'X':
-					count += printf("%X", va_arg(args, unsigned int));
-					break;
-				case '%':
-					_putchar('%');
-					count++;
-					break;
-				default:
-					_putchar(format[i]);
-					count++;
-					break;
-			}
+			buffer[buff_ind++] = format[i];
+
+			if (buff_ind == BUFF_SIZE)
+				print_buffer(buffer, &buff_ind);
+
+			printed_chars++;
+
 		}
 		else
 		{
-			_putchar(format[i]);
-			count++;
+			print_buffer(buffer, &buff_ind);
+			flags = get_flags(format, &i);
+			width = get_width(format, &i, list);
+			precision = get_precision(format, &i, list);
+			size = get_size(format, &i);
+			++i;
+
+			printed = handle_print(format, &i, list, buffer,
+
+				flags, width, precision, size);
+
+			if (printed == -1)
+				return (-1);
+
+			printed_chars += printed;
 		}
 	}
-	va_end(args);
-	return (count);
+
+	print_buffer(buffer, &buff_ind);
+
+	va_end(list);
+
+	return (printed_chars);
+}
+
+/**
+ * print_buffer - Prints the contents of the buffer if it exist
+ * @buffer: Array of chars
+ * @buff_ind: Index at which to add next char, represents the length.
+ */
+void print_buffer(char buffer[], int *buff_ind)
+{
+	if (*buff_ind > 0)
+		write(1, &buffer[0], *buff_ind);
+
+	*buff_ind = 0;
 }

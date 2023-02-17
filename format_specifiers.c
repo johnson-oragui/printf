@@ -1,5 +1,42 @@
 #include "main.h"
-#include <stdio.h>
+
+/**
+ * print_number - prints a number send to this function
+ * @args: List of arguments
+ * Return: The number of arguments printed
+ */
+int print_number(va_list args)
+{
+	int n;
+	int div;
+	int len;
+	unsigned int num;
+
+	n  = va_arg(args, int);
+	div = 1;
+	len = 0;
+
+	if (n < 0)
+	{
+		len += _putchar('-');
+		num = n * -1;
+	}
+	else
+		num = n;
+
+	for (; num / div > 9; )
+		div *= 10;
+
+	for (; div != 0; )
+	{
+		len += _putchar('0' + num / div);
+		num %= div;
+		div /= 10;
+	}
+
+	return (len);
+}
+
 /**
  * print_char - Prints character
  * @list: list of arguments
@@ -7,7 +44,7 @@
  */
 int print_char(va_list list)
 {
-	_putchar(va_arg(list, int));
+	_write_char(va_arg(list, int));
 	return (1);
 }
 
@@ -25,7 +62,7 @@ int print_string(va_list list)
 	if (str == NULL)
 		str = "(null)";
 	for (i = 0; str[i] != '\0'; i++)
-		_putchar(str[i]);
+		_write_char(str[i]);
 	return (i);
 }
 
@@ -36,7 +73,7 @@ int print_string(va_list list)
  */
 int print_percent(__attribute__((unused))va_list list)
 {
-	_putchar('%');
+	_write_char('%');
 	return (1);
 }
 
@@ -52,7 +89,7 @@ int print_integer(va_list list)
 	num_length = print_number(list);
 	return (num_length);
 }
-int print_unsigned_number(unsigned int n);
+
 /**
  * unsigned_integer - Prints Unsigned integers
  * @list: List of all of the argumets
@@ -65,9 +102,9 @@ int unsigned_integer(va_list list)
 	num = va_arg(list, unsigned int);
 
 	if (num == 0)
-		return (print_unsigned_number(num));
+		return (print_unsgined_number(num));
 
 	if (num < 1)
 		return (-1);
-	return (print_unsigned_number(num));
+	return (print_unsgined_number(num));
 }

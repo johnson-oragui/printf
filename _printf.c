@@ -5,7 +5,7 @@
  * @format: string of all characters
  * Return: number of characters printed
  */
-int _printfconst char *format, ..()
+int _printf(const char *format, ..)
 {
 	int printed_chars;
 	conver_t f_list[] = {
